@@ -41,7 +41,7 @@ Each entry:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `key` | ✅ | string | Must be unique across **both** `teams` and `outposts` — a duplicate raises `teams[i].key: duplicate "..."`. Used as the link/planet identifier. |
+| `key` | ✅ | string | Must be unique among all team keys. A duplicate within `teams` raises `teams[i].key: duplicate "..."`. Used as the link/planet identifier. |
 | `name` | ✅ | truthy | Display name; also seeds the initials badge (first letters of the first two whitespace/`_`/`-`-separated words, uppercased). |
 | `color` | ✅ | hex string matching `^#[0-9a-fA-F]{6}$` | e.g. `#9370DB`. Any other format is rejected. |
 | `agents` | ✅ | array | See below. Rejected if not an array. |
@@ -95,9 +95,7 @@ Each type entry supports:
 | `label` | – | string | Shown in the legend. |
 | `emphasis` | – | boolean | When `true`, the beam renders as a thicker "pipe" (main-flow) line instead of a thin secondary beam. |
 
-None of `linkTypes`' inner fields are checked by `validateData` — malformed
-entries simply render with whatever the renderer's own fallback (`{color:
-'#aab4d8'}`) supplies for missing pieces.
+None of `linkTypes`' inner fields are checked by `validateData`. At render time: if a link references a type name absent from `linkTypes` entirely, the renderer falls back to the whole default object `{color: '#aab4d8'}`. If a custom type exists but lacks a `color` field, no per-field fallback is applied — it will have `undefined` color. Always specify `color` on custom types to avoid broken beams.
 
 ## `cores`
 
@@ -124,7 +122,7 @@ Optional array — observer nodes placed outside the main ring.
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `key` | ✅ | string | Rejected (`outposts[i].key: required`) if missing. Shares the same uniqueness namespace as `teams[].key` and is a valid `links` endpoint. |
+| `key` | ✅ | string | Rejected (`outposts[i].key: required`) if missing. Must not collide with any `teams[].key` or earlier `outposts[].key`; a duplicate raises `outposts[i].key: duplicate "..."`. Valid as a `links` endpoint. |
 | `name` | ✅ | truthy | Rejected (`outposts[i].name: required`) if missing. Also seeds the initials badge, same rule as `teams[].name`. |
 | `placement` | ✅ | one of `above`, `below`, `outer` | Any other value is rejected (`outposts[i].placement: must be one of above|below|outer`). Controls where the node is positioned relative to the ring. |
 | `label` | – | string | Subtitle line drawn under the outpost's name badge. |

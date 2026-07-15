@@ -33,7 +33,9 @@ export function validateData(d) {
   });
   (d.outposts || []).forEach((o, i) => {
     const at = `outposts[${i}]`;
-    if (!o.key) errs.push(`${at}.key: required`); else keys.add(o.key);
+    if (!o.key) errs.push(`${at}.key: required`);
+    else if (keys.has(o.key)) errs.push(`${at}.key: duplicate "${o.key}"`);
+    else keys.add(o.key);
     if (!o.name) errs.push(`${at}.name: required`);
     if (!PLACEMENTS.includes(o.placement)) errs.push(`${at}.placement: must be one of ${PLACEMENTS.join('|')}`);
   });

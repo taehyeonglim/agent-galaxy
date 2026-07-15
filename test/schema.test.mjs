@@ -35,6 +35,17 @@ test('bad outpost placement', () => {
   const d = { ...VALID, outposts: [{ key: 'o', name: 'O', placement: 'left' }] };
   assert.ok(validateData(d).some(e => e.includes('placement')));
 });
+test('outpost key colliding with team key is rejected', () => {
+  const d = { ...VALID, outposts: [{ key: 'a', name: 'Clash', placement: 'outer' }] };
+  assert.ok(validateData(d).some(e => e.includes('outposts[0].key: duplicate')));
+});
+test('duplicate outpost keys are rejected', () => {
+  const d = { ...VALID, outposts: [
+    { key: 'o1', name: 'One', placement: 'outer' },
+    { key: 'o1', name: 'Two', placement: 'below' },
+  ] };
+  assert.ok(validateData(d).some(e => e.includes('outposts[1].key: duplicate')));
+});
 test('applyDefaults fills linkTypes + arrays + meta', () => {
   const out = applyDefaults({ meta: { title: 'X' }, teams: VALID.teams });
   assert.equal(out.meta.subtitle, 'AGENT GALAXY');
