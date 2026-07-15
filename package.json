@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node galaxy.mjs --serve",
-    "test": "node --test test/",
+    "test": "node --test",
     "test:unit": "node --test test/schema.test.mjs test/adapter.test.mjs"
   },
   "devDependencies": {
