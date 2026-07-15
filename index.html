@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NERV · MAGI GALAXY — Workflow Cosmos</title>
+<!--
+  WORKFLOW Galaxy Cinema — 미사토 WORKFLOW 전체화면 시네마 (data.json 기반)
+  canvas 수동 3D 투영(seele-cinema 엔진 컨벤션) · 팀장=캐릭터 얼굴 행성 · 서브에이전트=3D 공전 위성
+  MAGI=3코어 삼위일체 · 핸드오프=항성간 광선 · 호버 팝업=화면공간 별도 HUD
+  설계: docs/superpowers/specs/2026-06-20-workflow-galaxy-cinema-design.md
+-->
+<link rel="stylesheet" href="cinema.css?v=20260621">
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="nebula"></div>
+<canvas id="gx"></canvas>
+
+<div class="hud">
+  <div class="hud-top">
+    <div class="brand"><span class="logo">NERV</span><span class="sub">MAGI · GALAXY</span><span class="ver">v5.7+</span></div>
+    <div class="hud-grade"><span class="gl">GRADE</span><span class="gv">B+</span></div>
+  </div>
+  <div class="hud-center"><span>WORKFLOW COSMOS · 3D</span><span class="beatdot">●</span><span id="clock">--:--:--</span></div>
+  <div class="legend">
+    <b>HANDOFF STREAMS</b>
+    <div class="lg"><i style="border-color:#3ef0a0"></i>Formal Core</div>
+    <div class="lg"><i style="border-color:#aab4d8;border-top-style:dashed"></i>Secondary</div>
+    <div class="lg"><i style="border-color:#ff69b4;border-top-style:dashed"></i>Revision</div>
+    <div class="lg"><i style="border-color:#2fd0ff;border-top-style:dotted"></i>Expert</div>
+    <div class="lg s"><i style="background:#3ef0a0;box-shadow:0 0 8px #3ef0a0"></i>실행 중 위성</div>
+  </div>
+  <div class="controls">
+    <button class="ctl" id="btn-fs">⛶ FULLSCREEN</button>
+    <button class="ctl on" id="btn-spin">◐ AUTO-ORBIT</button>
+    <button class="ctl" id="btn-replay">↻ REPLAY</button>
+  </div>
+  <div class="hint">드래그=카메라 공전 · 휠=줌 · 행성에 마우스=에이전트 팝업 · F=전체화면</div>
+</div>
+
+<div id="pop"></div>
+<div class="scanlines"></div><div class="grain"></div><div class="vignette"></div><div class="frame"></div>
+
+<div class="boot" id="boot"><div class="boot-in">
+  <div class="boot-logo">NERV</div>
+  <div class="boot-lines" id="boot-lines"></div>
+  <div class="boot-bar"><i></i></div>
+</div></div>
+
+<script src="cinema.js?v=20260621" defer></script>
+</body>
+</html>

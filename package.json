@@ -1,0 +1,14 @@
+{
+  "name": "agent-galaxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node galaxy.mjs --serve",
+    "test": "node --test test/",
+    "test:unit": "node --test test/schema.test.mjs test/adapter.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
