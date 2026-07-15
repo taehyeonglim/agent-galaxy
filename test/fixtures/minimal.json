@@ -1,0 +1,2 @@
+{ "meta": { "title": "MINIMAL" },
+  "teams": [{ "key": "solo", "name": "Solo", "color": "#5ad6ff", "agents": [{ "name": "only-agent" }] }] }

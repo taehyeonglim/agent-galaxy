@@ -1,0 +1,36 @@
+{
+  "meta": { "title": "NOVA COLLECTIVE", "subtitle": "AGENT GALAXY", "version": "v0.1" },
+  "teams": [
+    { "key": "scout", "name": "Scout", "role": "RECON", "stage": "DISCOVER", "color": "#5ad6ff", "emoji": "🔭",
+      "agents": [{ "name": "web-scout" }, { "name": "source-hunter" }, { "name": "trend-scanner" }, { "name": "feed-watcher", "running": true }] },
+    { "key": "analysis", "name": "Analysis", "role": "INSIGHT", "stage": "DIGEST", "color": "#9370DB", "emoji": "🧬",
+      "agents": [{ "name": "summarizer", "running": true }, { "name": "method-critic" }, { "name": "data-profiler" }, { "name": "fact-checker" }, { "name": "tagger" }] },
+    { "key": "writing", "name": "Writing", "role": "PROSE", "stage": "DRAFT", "color": "#FF69B4", "emoji": "✍️",
+      "agents": [{ "name": "draft-writer" }, { "name": "editor" }, { "name": "abstract-smith" }, { "name": "style-polisher" }] },
+    { "key": "review", "name": "Review", "role": "QUALITY", "stage": "GATE", "color": "#FF4060", "emoji": "🛡️",
+      "agents": [{ "name": "style-checker" }, { "name": "gap-finder" }, { "name": "red-teamer" }] },
+    { "key": "build", "name": "Build", "role": "FORGE", "stage": "SHIP", "color": "#3ef0a0", "emoji": "🔧",
+      "agents": [{ "name": "scaffolder" }, { "name": "test-writer", "running": true }, { "name": "refactorer" }, { "name": "doc-generator" }, { "name": "release-bot" }] },
+    { "key": "ops", "name": "Mission Ops", "role": "OPERATIONS", "stage": "RUN", "color": "#FF8C42", "emoji": "📡",
+      "agents": [{ "name": "scheduler" }, { "name": "monitor", "running": true }, { "name": "janitor" }, { "name": "archivist" }] }
+  ],
+  "links": [
+    ["scout", "analysis", "pipeline"],
+    ["analysis", "writing", "pipeline"],
+    ["writing", "review", "pipeline"],
+    ["review", "writing", "revision"],
+    ["build", "ops", "pipeline"],
+    ["scout", "build", "cross"],
+    ["analysis", "ops", "expert"],
+    ["writing", "archive", "cross"]
+  ],
+  "cores": [
+    { "id": "PLANNER", "label": "claude", "color": "#ff9a5a" },
+    { "id": "BUILDER", "label": "gpt", "color": "#6fe0a0" },
+    { "id": "ORACLE", "label": "gemini", "color": "#5ad6ff" }
+  ],
+  "outposts": [
+    { "key": "founder", "name": "The Founder", "label": "OBSERVER", "color": "#95a5a6", "placement": "below", "emoji": "👁️" },
+    { "key": "archive", "name": "Archive", "label": "KNOWLEDGE BASE", "color": "#DA70D6", "placement": "outer", "emoji": "📚" }
+  ]
+}

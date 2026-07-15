@@ -1,0 +1,7 @@
+{ "meta": { "title": "CORES FIVE" },
+  "teams": [
+    { "key": "a", "name": "Alpha", "color": "#9370DB", "agents": [{ "name": "a1" }, { "name": "a2" }] },
+    { "key": "b", "name": "Beta", "color": "#3ef0a0", "agents": [{ "name": "b1" }] }
+  ],
+  "links": [["a", "b", "pipeline"]],
+  "cores": [{ "id": "C1", "label": "one", "color": "#ff9a5a" }, { "id": "C2", "label": "two", "color": "#5ad6ff" }, { "id": "C3", "label": "three", "color": "#3ef0a0" }, { "id": "C4", "label": "four", "color": "#FF69B4" }, { "id": "C5", "label": "five", "color": "#FFD700" }] }

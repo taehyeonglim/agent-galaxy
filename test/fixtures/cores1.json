@@ -1,0 +1,7 @@
+{ "meta": { "title": "CORES ONE" },
+  "teams": [
+    { "key": "a", "name": "Alpha", "color": "#9370DB", "agents": [{ "name": "a1" }, { "name": "a2" }] },
+    { "key": "b", "name": "Beta", "color": "#3ef0a0", "agents": [{ "name": "b1" }] }
+  ],
+  "links": [["a", "b", "pipeline"]],
+  "cores": [{ "id": "HUB", "label": "solo core", "color": "#ff9a5a" }] }

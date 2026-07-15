@@ -1,0 +1,7 @@
+{ "meta": { "title": "CORES TWO" },
+  "teams": [
+    { "key": "a", "name": "Alpha", "color": "#9370DB", "agents": [{ "name": "a1" }, { "name": "a2" }] },
+    { "key": "b", "name": "Beta", "color": "#3ef0a0", "agents": [{ "name": "b1" }] }
+  ],
+  "links": [["a", "b", "pipeline"]],
+  "cores": [{ "id": "LEFT", "label": "l", "color": "#ff9a5a" }, { "id": "RIGHT", "label": "r", "color": "#5ad6ff" }] }
