@@ -1,5 +1,7 @@
 # agent-galaxy
 
+**English** | [한국어](README.ko.md)
+
 **See your AI agent team as a living galaxy.** Teams are planets, agents orbit as
 satellites, handoffs stream between stars — a zero-dependency 3D visualization for
 multi-agent systems, rendered with manual 3D projection on a single Canvas 2D.
