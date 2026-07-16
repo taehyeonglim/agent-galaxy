@@ -22,6 +22,7 @@ export function validateData(d) {
   }
   const keys = new Set();
   d.teams.forEach((t, i) => {
+    if (!t || typeof t !== 'object') { errs.push(`teams[${i}]: must be an object`); return; }
     const at = `teams[${i}]`;
     if (!t.key || typeof t.key !== 'string') errs.push(`${at}.key: required string`);
     else if (keys.has(t.key)) errs.push(`${at}.key: duplicate "${t.key}"`);
@@ -32,6 +33,7 @@ export function validateData(d) {
     else t.agents.forEach((a, j) => { if (!a || !a.name) errs.push(`${at}.agents[${j}].name: required`); });
   });
   (d.outposts || []).forEach((o, i) => {
+    if (!o || typeof o !== 'object') { errs.push(`outposts[${i}]: must be an object`); return; }
     const at = `outposts[${i}]`;
     if (!o.key) errs.push(`${at}.key: required`);
     else if (keys.has(o.key)) errs.push(`${at}.key: duplicate "${o.key}"`);
@@ -44,7 +46,10 @@ export function validateData(d) {
     if (!keys.has(l[0])) errs.push(`links[${i}]: unknown from "${l[0]}"`);
     if (!keys.has(l[1])) errs.push(`links[${i}]: unknown to "${l[1]}"`);
   });
-  (d.cores || []).forEach((c, i) => { if (!c.id) errs.push(`cores[${i}].id: required`); });
+  (d.cores || []).forEach((c, i) => {
+    if (!c || typeof c !== 'object') { errs.push(`cores[${i}]: must be an object`); return; }
+    if (!c.id) errs.push(`cores[${i}].id: required`);
+  });
   return errs;
 }
 

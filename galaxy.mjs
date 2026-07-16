@@ -4,7 +4,7 @@
    and serves the viewer. Node >= 18, zero dependencies. */
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createServer as httpServer } from 'node:http';
-import { join, extname, resolve, relative, basename, dirname } from 'node:path';
+import { join, extname, resolve, relative, isAbsolute, basename, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { validateData } from './schema.mjs';
 
@@ -90,7 +90,8 @@ export function createGalaxyServer(root, { dataFile } = {}) {
     if (p === '/') p = '/index.html';
     const isData = p === '/data.json' && dataFile;
     const file = isData ? resolve(dataFile) : resolve(join(absRoot, p));
-    if (!isData && !file.startsWith(absRoot + '/') && file !== absRoot) { res.writeHead(403); return res.end(); }
+    const rel = relative(absRoot, file);
+    if (!isData && (rel.startsWith('..') || isAbsolute(rel))) { res.writeHead(403); return res.end(); }
     if (!existsSync(file) || statSync(file).isDirectory()) { res.writeHead(404); return res.end('not found'); }
     res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(readFileSync(file));
@@ -101,7 +102,9 @@ function main() {
   const argv = process.argv.slice(2);
   const flag = (n) => { const i = argv.indexOf(n); return i === -1 ? null : (argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : true); };
   const root = dirname(fileURLToPath(import.meta.url));
-  const scan = flag('--scan'), serve = flag('--serve'), port = Number(flag('--port')) || 8420;
+  const scan = flag('--scan'), serve = flag('--serve');
+  const portFlag = flag('--port');
+  const port = (typeof portFlag === 'string' && Number(portFlag) > 0) ? Number(portFlag) : 8420;
   const groupBy = flag('--group-by') || 'model';
   const out = typeof flag('--out') === 'string' ? flag('--out') : join(root, 'data.json');
   const dataFile = typeof flag('--data') === 'string' ? flag('--data') : null;
@@ -121,7 +124,8 @@ function main() {
     console.log(`✔ ${agents.length} agents → ${out}`);
   }
   if (serve) {
-    createGalaxyServer(root, { dataFile }).listen(port, () => console.log(`✦ agent-galaxy → http://localhost:${port}`));
+    const serveData = dataFile || (scan && out !== join(root, 'data.json') ? out : null);
+    createGalaxyServer(root, { dataFile: serveData }).listen(port, '127.0.0.1', () => console.log(`✦ agent-galaxy → http://localhost:${port}`));
   }
 }
 

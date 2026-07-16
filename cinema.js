@@ -13,6 +13,7 @@ try{
 }
 function initials(name){const w=String(name).trim().split(/[\s_-]+/).filter(Boolean);
   return ((w[0]?.[0]||'?')+(w[1]?.[0]||w[0]?.[1]||'')).toUpperCase();}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const IMGC={}; function IMG(src){ if(!src) return null; if(!IMGC[src]){IMGC[src]=new Image();IMGC[src].src=src;} return IMGC[src]; }
 const TEAMS={}; const ORDER=D.teams.map(t=>t.key);
 D.teams.forEach(t=>{ TEAMS[t.key]={ name:t.name, role:t.role||'', color:t.color, stage:t.stage||'',
@@ -122,7 +123,7 @@ function drawBadge(pp, color, node, worldR, label, sub, sun, opt){
     g.fillStyle='#0a0614';g.font='700 '+Math.max(8,Math.round(br*1.05))+'px "IBM Plex Mono",monospace';
     g.textAlign='center';g.textBaseline='middle';g.fillText(''+opt.count,bx,by+0.5);g.textBaseline='alphabetic';}
   // 라벨
-  if(label){g.font='700 '+Math.max(11,Math.round(13*pp.s))+'px "IBM Plex Sans","NanumGothic",sans-serif';
+  if(label){g.font='700 '+Math.max(11,Math.round(13*pp.s))+'px "IBM Plex Sans",sans-serif';
     g.textAlign='center';g.fillStyle=color;g.shadowColor=color;g.shadowBlur=10;
     g.fillText(label,sx,sy+r+15);g.shadowBlur=0;}
   if(sub){g.font='600 9px "IBM Plex Mono",monospace';g.fillStyle=withA(color,0.7);g.textAlign='center';g.fillText(sub,sx,sy+r+27);}
@@ -289,7 +290,7 @@ function drawBeams(t){
     const A=nodePos(s); if(!A) continue;
     const B=nodePos(d); if(!B) continue;
     const lt=D.linkTypes[type]||{color:'#aab4d8'};
-    const pipe=!!lt.emphasis, col=lt.color;
+    const pipe=!!lt.emphasis, col=lt.color||'#aab4d8';
     // 중심에서 바깥으로 부풀린 제어점(중앙 엉킴 회피) + 살짝 위
     const mid=[(A[0]+B[0])/2,(A[1]+B[1])/2,(A[2]+B[2])/2];
     let dx=mid[0], dz=mid[2]; const L=Math.hypot(dx,dz)||1;
@@ -331,9 +332,9 @@ function updatePopup(){
 function renderPopup(k){
   const t=TEAMS[k];
   pop.style.setProperty('--cc',t.color);
-  const rows=t.agents.map(a=>`<div class="pa${t._run.has(a)?' run':''}"><span class="d"></span>${a}</div>`).join('');
-  pop.innerHTML=`<div class="ph"><span class="pdot"></span><div><div class="pnm">${t.name}</div><div class="prl">${t.role}</div></div><span class="pct">${t.agents.length}</span></div>
-    <div class="pstg">${t.stage}</div><div class="pl">${rows}</div>`;
+  const rows=t.agents.map(a=>`<div class="pa${t._run.has(a)?' run':''}"><span class="d"></span>${esc(a)}</div>`).join('');
+  pop.innerHTML=`<div class="ph"><span class="pdot"></span><div><div class="pnm">${esc(t.name)}</div><div class="prl">${esc(t.role)}</div></div><span class="pct">${t.agents.length}</span></div>
+    <div class="pstg">${esc(t.stage)}</div><div class="pl">${rows}</div>`;
 }
 
 /* ════════ 인터랙션 ════════ */
@@ -372,10 +373,11 @@ setInterval(()=>document.getElementById('clock').textContent=new Date().toTimeSt
 /* 범례 — 실제 사용된 링크 타입에서 생성 */
 const legend=document.getElementById('legend');
 const usedTypes=[...new Set(LINKS.map(l=>l[2]))];
-if(usedTypes.length||D.teams.some(t=>t.agents.some(a=>a.running))){
+const hasRunning=D.teams.some(t=>t.agents.some(a=>a.running));
+if(usedTypes.length||hasRunning){
   legend.innerHTML='<b>LINKS</b>'
-    +usedTypes.map(k=>{const v=D.linkTypes[k]||{color:'#aab4d8'};return '<div class="lg"><i style="border-color:'+v.color+'"></i>'+(v.label||k)+'</div>';}).join('')
-    +'<div class="lg s"><i style="background:#3ef0a0;box-shadow:0 0 8px #3ef0a0"></i>running agent</div>';
+    +usedTypes.map(k=>{const v=D.linkTypes[k]||{color:'#aab4d8'};return '<div class="lg"><i style="border-color:'+v.color+'"></i>'+esc(v.label||k)+'</div>';}).join('')
+    +(hasRunning?'<div class="lg s"><i style="background:#3ef0a0;box-shadow:0 0 8px #3ef0a0"></i>running agent</div>':'');
 }else legend.style.display='none';
 
 /* ════════ 부팅 시퀀스 ════════ */
