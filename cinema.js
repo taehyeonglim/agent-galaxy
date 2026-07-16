@@ -23,7 +23,7 @@ const ANG={}; ORDER.forEach((k,i)=>{ ANG[k]=i*360/ORDER.length; });
 const LINKS=D.links;
 const totalAgents=D.teams.reduce((n,t)=>n+t.agents.length,0);
 
-/* ════════ 3D 월드 구축 ════════ */
+/* ════════ 3D world construction ════════ */
 const PR=360;
 const planets={};
 function hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
@@ -40,7 +40,7 @@ ORDER.forEach(k=>{
 });
 const SUN={pos:[0,0,0], r:54};
 
-/* ════════ Outposts — 링 밖 관조 노드 (above/below/outer) ════════ */
+/* ════════ Outposts — observer nodes outside the ring (above/below/outer) ════════ */
 function outPos(o, arr){
   const sibs=arr.filter(x=>x.placement===o.placement), j=sibs.indexOf(o), off=(j-(sibs.length-1)/2)*180;
   if(o.placement==='above') return [off,300,-60];
@@ -50,13 +50,13 @@ function outPos(o, arr){
 const OUTPOSTS=D.outposts.map((o,_,arr)=>({ ...o, pos:outPos(o,arr), r:o.placement==='outer'?22:28,
   node:{initials:initials(o.name), emoji:o.emoji||null, image:o.image||null} }));
 
-/* ════════ Cores — 중앙 허브 0~N (1=중앙, 2=대칭, ≥3=다각 전력망) ════════ */
+/* ════════ Cores — central hub 0~N (1=centered, 2=symmetric, ≥3=polygonal power grid) ════════ */
 const CORE_R=50, POLY_R=92, ACCENT=D.meta.accent;
 const CORES=D.cores.map((c,i)=>({ ...c,
   ang: D.cores.length===1?0:(-Math.PI/2 + i*2*Math.PI/D.cores.length),
   rad: D.cores.length===1?0:CORE_R }));
 
-/* ════════ 카메라 + 투영 (manual 3D projection) ════════ */
+/* ════════ Camera + projection (manual 3D projection) ════════ */
 const FOV=720, CAM_DIST=900, TILT=27*Math.PI/180;
 const cam={yaw:0, pitch:0, scale:1, zoom:1, w:0, h:0, dragging:false};
 const PITCH_MIN=-46*Math.PI/180, PITCH_MAX=24*Math.PI/180;
@@ -70,7 +70,7 @@ function project(x,y,z){
   return {sx:cam.w/2+rx*s, sy:cam.h*0.47-ty*s, z:tz, s, depth, vis:depth>60};
 }
 
-/* ════════ 렌더 헬퍼 ════════ */
+/* ════════ Render helpers ════════ */
 const gx=document.getElementById('gx'), g=gx.getContext('2d');
 let DPR=1;
 function withA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
@@ -79,16 +79,16 @@ function lighten(hex,f){const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,gg=(
 function darken(hex,f){const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,gg=(n>>8)&255,b=n&255;
   r=Math.round(r*(1-f));gg=Math.round(gg*(1-f));b=Math.round(b*(1-f));return `rgb(${r},${gg},${b})`;}
 
-/* 노드 배지 포트레이트 (원형 아바타 + 팀틴트 + 글로우링 + 배지 + 3D 림 비네트) */
+/* Node badge portrait (circular avatar + team tint + glow ring + count badge + 3D rim vignette) */
 function drawBadge(pp, color, node, worldR, label, sub, sun, opt){
   const r=Math.max(6, worldR*pp.s), sx=pp.sx, sy=pp.sy;
   let lx=0,ly=0; if(sun){lx=sun.sx-sx;ly=sun.sy-sy;const ll=Math.hypot(lx,ly)||1;lx/=ll;ly/=ll;}
   const active=opt&&opt.active;
-  // 외곽 글로우
+  // outer glow
   const halo=g.createRadialGradient(sx,sy,r*0.8,sx,sy,r*1.95);
   halo.addColorStop(0,withA(color,active?0.32:0.20));halo.addColorStop(1,withA(color,0));
   g.fillStyle=halo;g.beginPath();g.arc(sx,sy,r*1.95,0,7);g.fill();
-  // 얼굴 (원형 클립)
+  // face (circular clip)
   g.save();g.beginPath();g.arc(sx,sy,r,0,7);g.clip();
   const img=IMG(node.image);
   if(img&&img.complete&&img.naturalWidth){
@@ -105,24 +105,24 @@ function drawBadge(pp, color, node, worldR, label, sub, sun, opt){
     else { g.fillStyle='rgba(6,4,12,0.82)';g.font='700 '+Math.round(r*0.72)+'px "IBM Plex Mono",monospace';g.fillText(node.initials,sx,sy+r*0.04); }
     g.textBaseline='alphabetic';
   }
-  // 림 비네트 (구면 착시)
+  // rim vignette (spherical illusion)
   const vg=g.createRadialGradient(sx,sy,r*0.5,sx,sy,r);
   vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,0.5)');
   g.fillStyle=vg;g.beginPath();g.arc(sx,sy,r,0,7);g.fill();
-  // 항성쪽 명암
+  // sun-side shading
   if(sun){const tg=g.createRadialGradient(sx+lx*r*0.55,sy+ly*r*0.55,r*0.15,sx-lx*r*0.4,sy-ly*r*0.5,r*1.3);
     tg.addColorStop(0,'rgba(0,0,0,0)');tg.addColorStop(0.6,'rgba(0,0,0,0.04)');tg.addColorStop(1,'rgba(0,0,0,0.5)');
     g.fillStyle=tg;g.beginPath();g.arc(sx,sy,r,0,7);g.fill();}
   g.restore();
-  // 글로우 링
+  // glow ring
   g.lineWidth=Math.max(1.2,r*0.07);g.strokeStyle=color;g.shadowColor=color;g.shadowBlur=active?16:9;
   g.beginPath();g.arc(sx,sy,r,0,7);g.stroke();g.shadowBlur=0;
-  // 카운트 배지 (우상단)
+  // count badge (top-right)
   if(opt&&opt.count!=null){const bx=sx+r*0.71, by=sy-r*0.71, br=Math.max(7,r*0.27);
     g.fillStyle=color;g.beginPath();g.arc(bx,by,br,0,7);g.fill();
     g.fillStyle='#0a0614';g.font='700 '+Math.max(8,Math.round(br*1.05))+'px "IBM Plex Mono",monospace';
     g.textAlign='center';g.textBaseline='middle';g.fillText(''+opt.count,bx,by+0.5);g.textBaseline='alphabetic';}
-  // 라벨
+  // label
   if(label){g.font='700 '+Math.max(11,Math.round(13*pp.s))+'px "IBM Plex Sans",sans-serif';
     g.textAlign='center';g.fillStyle=color;g.shadowColor=color;g.shadowBlur=10;
     g.fillText(label,sx,sy+r+15);g.shadowBlur=0;}
@@ -133,12 +133,12 @@ function drawPlanet(pp, P, t, sun){
   drawBadge(pp, P.color, P.node, P.r, P.name, (P.stage?P.stage+' · ':'')+P.agents.length, sun, {count:P.agents.length, active:runc>0});
 }
 
-/* ════════ 중앙 코어 허브 — 0~N 데이터 주도 ════════ */
+/* ════════ Central core hub — data-driven 0~N ════════ */
 function pushCores(items, t){
   if(!CORES.length) return;
   const cen=project(0,0,0);
   const cores=CORES.map(c=>({ ...c, p:project(Math.cos(c.ang)*c.rad,0,Math.sin(c.ang)*c.rad), vcol:c.color||ACCENT }));
-  // N각 발광 베이스 (N>=3)
+  // N-gon glowing base (N>=3)
   if(cores.length>=3){
     const off=Math.PI/cores.length;
     const tv=cores.map(c=>project(Math.cos(c.ang+off)*POLY_R,0,Math.sin(c.ang+off)*POLY_R));
@@ -150,7 +150,7 @@ function pushCores(items, t){
       g.strokeStyle=ACCENT;g.lineWidth=3.2;g.shadowColor=withA(ACCENT,0.95);g.shadowBlur=12;g.stroke();g.shadowBlur=0;
     }});
   }
-  // 인접 코어간 전력망 아크 + 중앙 수렴선 (N>=2)
+  // adjacent-core power grid arcs + central convergence lines (N>=2)
   if(cores.length>=2){
     const pairs=cores.length===2?1:cores.length;
     for(let i=0;i<pairs;i++){
@@ -171,7 +171,7 @@ function pushCores(items, t){
       }});
     }
   }
-  // 코어 (회전 육각 홀로프레임 + 라벨 — 로고 없음, image 필드는 옵션)
+  // core (rotating hex holoframe + label — no logo, image field is optional)
   cores.forEach((c,i)=>{
     const p=c.p, vcol=c.vcol, vglow=lighten(vcol,0.4), rad=Math.max(11,24*p.s);
     items.push({z:p.z, draw:()=>{
@@ -199,7 +199,7 @@ function pushCores(items, t){
         g.fillText(c.label,p.sx,p.sy+rad+12);}
     }});
   });
-  // 허브 라벨 (N>=2일 때 중앙 위 부양; N==1은 코어 자체가 중앙)
+  // hub label (floats above center when N>=2; N==1 the core itself is centered)
   if(cores.length>=2){
     const top=project(0,95,0);
     items.push({z:top.z+5, draw:()=>{
@@ -211,11 +211,11 @@ function pushCores(items, t){
   }
 }
 
-/* ════════ 메인 렌더 ════════ */
+/* ════════ Main render ════════ */
 let t0=0, picks=[];
 function frame(now){
   if(!t0)t0=now;const t=(now-t0)/1000;
-  // 카메라 자동 공전 (느리게)
+  // camera auto-orbit (slow)
   if(spin && !cam.dragging) cam.yaw+=0.0006;
   const w=cam.w, h=cam.h;
   g.setTransform(DPR,0,0,DPR,0,0);
@@ -223,18 +223,18 @@ function frame(now){
 
   const items=[];   // {z, draw}
   picks=[];
-  const sunScreen=project(...SUN.pos);   // 항성 광원 화면좌표 (모든 행성 명암 기준)
+  const sunScreen=project(...SUN.pos);   // sun light-source screen coords (basis for all planet shading)
 
-  // 행성 + 위성 월드 위치
+  // planet + moon world positions
   for(const k of ORDER){
     const P=planets[k], pp=project(...P.pos);
     P.screen={sx:pp.sx, sy:pp.sy, r:Math.max(6,P.r*pp.s), z:pp.z, vis:pp.vis};
     picks.push({key:k, sx:pp.sx, sy:pp.sy, r:Math.max(14,P.r*pp.s*1.15)});
 
-    // 위성: 3D 경사궤도
+    // moons: 3D inclined orbit
     for(const m of P.moons){
       const ci=Math.cos(m.incl), si=Math.sin(m.incl);
-      // 궤도 표시 (반드시) — 3D 경사궤도를 타원 폴리라인으로
+      // orbit trace (always) — 3D inclined orbit as an elliptical polyline
       items.push({z:pp.z-3, draw:()=>{
         g.beginPath();
         for(let s=0;s<=36;s++){const aa=s/36*Math.PI*2, ox=m.rr*Math.cos(aa), oz=m.rr*Math.sin(aa);
@@ -256,10 +256,10 @@ function frame(now){
         g.beginPath();g.arc(mp.sx,mp.sy,mr,0,7);g.fill();
       }});
     }
-    // 행성 본체 (진짜 행성 렌더)
+    // planet body (actual planet render)
     items.push({z:pp.z, draw:()=>drawPlanet(pp, P, t, sunScreen)});
   }
-  // Outposts + 중앙 연결 점선 (코어 있을 때만)
+  // Outposts + dashed line to center (only when a core exists)
   for(const O of OUTPOSTS){
     const mp=project(...O.pos), cc=project(0,0,0);
     if(CORES.length){
@@ -272,14 +272,14 @@ function frame(now){
   }
   pushCores(items, t);
 
-  // ── 핸드오프 빔 (구체 아래 레이어, 3D 곡선) ──
+  // ── handoff beams (layer beneath the spheres, 3D curve) ──
   drawBeams(t);
 
-  // ── 깊이정렬 후 그리기 (뒤→앞) ──
+  // ── depth-sort then draw (back→front) ──
   items.sort((a,b)=>a.z-b.z);
   for(const it of items) it.draw();
 
-  // 호버 팝업 위치 갱신
+  // update hover popup position
   updatePopup();
   requestAnimationFrame(frame);
 }
@@ -291,16 +291,16 @@ function drawBeams(t){
     const B=nodePos(d); if(!B) continue;
     const lt=D.linkTypes[type]||{color:'#aab4d8'};
     const pipe=!!lt.emphasis, col=lt.color||'#aab4d8';
-    // 중심에서 바깥으로 부풀린 제어점(중앙 엉킴 회피) + 살짝 위
+    // control point bulged outward from center (avoids central clumping) + slightly raised
     const mid=[(A[0]+B[0])/2,(A[1]+B[1])/2,(A[2]+B[2])/2];
     let dx=mid[0], dz=mid[2]; const L=Math.hypot(dx,dz)||1;
     const M=[mid[0]+dx/L*72, mid[1]+30, mid[2]+dz/L*72];
     const N=24, pts=[];
     for(let i=0;i<=N;i++){const b=bez3(A,M,B,i/N); pts.push(project(b[0],b[1],b[2]));}
-    // 은은한 베이스 (코어 또렷 · 보조 흐릿 — 위계로 난잡 완화)
+    // subtle base (core sharp · secondary faint — hierarchy reduces clutter)
     g.beginPath();g.moveTo(pts[0].sx,pts[0].sy);for(let i=1;i<=N;i++)g.lineTo(pts[i].sx,pts[i].sy);
     g.strokeStyle=withA(col,pipe?0.16:0.075);g.lineWidth=pipe?1.5:1;g.stroke();
-    // 단일 코멧 + 짧은 꼬리 (깔끔한 방향 흐름) — 빔별 위상 분산
+    // single comet + short tail (clean directional flow) — phase-spread per beam
     const u=((t*0.12)+(hash(s+d)%100)/100)%1;
     for(let q=4;q>=0;q--){const uu=u-q*0.022; if(uu<0)continue;
       const b=bez3(A,M,B,uu), pr=project(b[0],b[1],b[2]), head=q===0;
@@ -311,7 +311,7 @@ function drawBeams(t){
 }
 function bez3(A,M,B,u){const iu=1-u;return [iu*iu*A[0]+2*iu*u*M[0]+u*u*B[0], iu*iu*A[1]+2*iu*u*M[1]+u*u*B[1], iu*iu*A[2]+2*iu*u*M[2]+u*u*B[2]];}
 
-/* ════════ 호버 팝업 (화면공간 별도 카드) ════════ */
+/* ════════ Hover popup (separate screen-space card) ════════ */
 const pop=document.getElementById('pop');
 let hoverKey=null, mouse={x:-999,y:-999};
 function updatePopup(){
@@ -321,7 +321,7 @@ function updatePopup(){
     if(dd<pk.r*pk.r && dd<bd){bd=dd;best=pk;}}
   if(!best){pop.classList.remove('show');hoverKey=null;return;}
   if(best.key!==hoverKey){hoverKey=best.key;renderPopup(best.key);}
-  // 위치: 행성 오른쪽, 화면 안으로 clamp
+  // position: right of the planet, clamped inside the screen
   const pw=pop.offsetWidth||220, ph=pop.offsetHeight||200;
   let px=best.sx+best.r+14, py=best.sy-ph/2;
   if(px+pw>cam.w-12) px=best.sx-best.r-14-pw;
@@ -337,7 +337,7 @@ function renderPopup(k){
     <div class="pstg">${esc(t.stage)}</div><div class="pl">${rows}</div>`;
 }
 
-/* ════════ 인터랙션 ════════ */
+/* ════════ Interaction ════════ */
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);cam.w=innerWidth;cam.h=innerHeight;
   gx.width=cam.w*DPR;gx.height=cam.h*DPR;gx.style.width=cam.w+'px';gx.style.height=cam.h+'px';
   cam.scale=Math.min(cam.w/1180, cam.h/760);}
@@ -353,7 +353,7 @@ gx.addEventListener('pointermove',e=>{
 addEventListener('pointerup',()=>{cam.dragging=false;document.body.classList.remove('dragging');});
 gx.addEventListener('wheel',e=>{e.preventDefault();cam.zoom=Math.max(0.55,Math.min(2.6,cam.zoom*(e.deltaY<0?1.08:0.93)));},{passive:false});
 
-/* 별필드 */
+/* Starfield */
 const bg=document.getElementById('bg'),bx=bg.getContext('2d');let stars=[];
 function initStars(){bg.width=innerWidth;bg.height=innerHeight;stars=[];const n=Math.min(240,innerWidth/7);
   for(let i=0;i<n;i++)stars.push({x:Math.random()*bg.width,y:Math.random()*bg.height,z:Math.random(),s:Math.random()*1.5+0.3,t:Math.random()*6});}
@@ -363,14 +363,14 @@ function bgLoop(){bx.clearRect(0,0,bg.width,bg.height);for(const s of stars){s.t
   requestAnimationFrame(bgLoop);}
 addEventListener('resize',initStars);initStars();bgLoop();
 
-/* ════════ HUD 주입 + 시계 ════════ */
+/* ════════ HUD injection + clock ════════ */
 document.getElementById('t-logo').textContent=D.meta.title;
 document.getElementById('t-sub').textContent=D.meta.subtitle;
 const verEl=document.getElementById('t-ver');
 if(D.meta.version) verEl.textContent=D.meta.version; else verEl.style.display='none';
 setInterval(()=>document.getElementById('clock').textContent=new Date().toTimeString().slice(0,8),1000);
 
-/* 범례 — 실제 사용된 링크 타입에서 생성 */
+/* Legend — built from the link types actually in use */
 const legend=document.getElementById('legend');
 const usedTypes=[...new Set(LINKS.map(l=>l[2]))];
 const hasRunning=D.teams.some(t=>t.agents.some(a=>a.running));
@@ -380,7 +380,7 @@ if(usedTypes.length||hasRunning){
     +(hasRunning?'<div class="lg s"><i style="background:#3ef0a0;box-shadow:0 0 8px #3ef0a0"></i>running agent</div>':'');
 }else legend.style.display='none';
 
-/* ════════ 부팅 시퀀스 ════════ */
+/* ════════ Boot sequence ════════ */
 let spin=true;
 document.getElementById('boot-logo').textContent=D.meta.title;
 const lines=[

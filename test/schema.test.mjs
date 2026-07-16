@@ -57,5 +57,5 @@ test('applyDefaults fills linkTypes + arrays + meta', () => {
 test('applyDefaults merges user linkType override onto default', () => {
   const out = applyDefaults({ meta: { title: 'X' }, teams: VALID.teams, linkTypes: { pipeline: { color: '#ffffff' } } });
   assert.equal(out.linkTypes.pipeline.color, '#ffffff');
-  assert.equal(out.linkTypes.pipeline.emphasis, true); // 기본값 보존
+  assert.equal(out.linkTypes.pipeline.emphasis, true); // default value preserved
 });

@@ -95,7 +95,7 @@ Each type entry supports:
 | `label` | – | string | Shown in the legend. |
 | `emphasis` | – | boolean | When `true`, the beam renders as a thicker "pipe" (main-flow) line instead of a thin secondary beam. |
 
-None of `linkTypes`' inner fields are checked by `validateData`. At render time: if a link references a type name absent from `linkTypes` entirely, the renderer falls back to the whole default object `{color: '#aab4d8'}`. If a custom type exists but lacks a `color` field, no per-field fallback is applied — it will have `undefined` color. Always specify `color` on custom types to avoid broken beams.
+None of `linkTypes`' inner fields are checked by `validateData`. At render time: if a link references a type name absent from `linkTypes` entirely, the renderer falls back to the whole default object `{color: '#aab4d8'}`. If a custom type exists but lacks a `color` field, the renderer falls back to `#aab4d8` for that beam (as of v0.1.1 — earlier versions left `color` `undefined`, which crashed the beam-color helper). Always specify `color` on custom types anyway — it's the only way to control the beam's actual color, and relying on the fallback is a style smell, not a safety net.
 
 ## `cores`
 
