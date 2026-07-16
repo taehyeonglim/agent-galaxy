@@ -56,6 +56,8 @@ npm install && npx playwright install chromium
 npm test
 ```
 
+Requires Node ≥ 18.
+
 ## License
 
 MIT

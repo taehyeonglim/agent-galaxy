@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 import { createGalaxyServer } from '../galaxy.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CASES = ['sample', 'minimal', 'large', 'cores0', 'cores1', 'cores2', 'cores5'];
+const CASES = ['sample', 'minimal', 'large', 'cores0', 'cores1', 'cores2', 'cores5', 'customlink'];
 mkdirSync(join(ROOT, 'test', 'screens'), { recursive: true });
 
 test('viewer renders every fixture: zero console errors + non-blank canvas', { timeout: 180_000 }, async () => {

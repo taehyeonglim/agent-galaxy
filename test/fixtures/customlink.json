@@ -1,0 +1,8 @@
+{ "meta": { "title": "CUSTOM LINKS" },
+  "teams": [
+    { "key": "a", "name": "Alpha", "color": "#9370DB", "agents": [{ "name": "a1" }] },
+    { "key": "b", "name": "Beta", "color": "#3ef0a0", "agents": [{ "name": "b1", "running": true }] }
+  ],
+  "links": [["a", "b", "mycustom"]],
+  "linkTypes": { "mycustom": { "emphasis": true } },
+  "cores": [{ "id": "HUB", "label": "router", "color": "#ff9a5a" }] }
